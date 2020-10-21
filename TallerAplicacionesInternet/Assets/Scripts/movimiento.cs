@@ -20,20 +20,31 @@ public class movimiento : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log(rigidBody.velocity.y);
         if (Input.GetButtonDown("Jump") && Mathf.Abs(rigidBody.velocity.y) < 0.01f){
-                 Debug.Log("jump");
             rigidBody.AddForce(Vector3.up * valorSalto, ForceMode.Impulse);
             audio.Play();
         }
-        // recibe de parametro 3 ejes
-                            // x    y   z     1    -1
-        // transform.Translate( Input.GetAxis("Horizontal") * velocidad * Time.deltaTime ,
-        //                      0 , 
-        //                      Input.GetAxis("Vertical") * velocidad *Time.deltaTime );
+        if(Input.touchCount == 1){
+            if (Input.touches[0].phase == TouchPhase.Began && Mathf.Abs(rigidBody.velocity.y) < 0.01f){
+                rigidBody.AddForce(Vector3.up * valorSalto, ForceMode.Impulse);
+                audio.Play();
+            }
+        }
     }
     void FixedUpdate() {
         // crear un objeto dentro de Add Force
         rigidBody.AddForce(new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical") * fuerzaValor));
+        // para el dispositivo movil
+        rigidBody.AddForce(new Vector3(Input.acceleration.x, 0, Input.acceleration.y) * fuerzaValor);
+    }
+    void OnCollisionEnter(Collision collisionInfo)
+    {
+        if(collisionInfo.gameObject.tag == "Enmigo"){
+            Destroy(collisionInfo.gameObject);
+        }
+    }
+    void OnTriggerEnter(Collider other)
+    {
+        Debug.Log("Entraste a la zona peligroso");
     }
 }
